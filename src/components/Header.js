@@ -26,8 +26,13 @@ export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [animationSpeed, setAnimationSpeed] = useState(3);
 
+  const [isAnimationEnabled, setIsAnimationEnabled] = useState(true);
+
   // Key Listeners
  
+ 
+
+
 
   //Sorting Speed
 
@@ -55,6 +60,9 @@ export default function App() {
     // eslint-disable-next-line
   }, [arraySize]);
   
+  
+
+
 
   const handleSliderChange = (e) => {
     const newSize = parseInt(e.target.value);
@@ -68,7 +76,35 @@ export default function App() {
     );
   };
 
-  // Merge Sort Function
+  // Stop Sorting function
+
+  const stopSorting = () => {
+    setIsSorting(false);
+    setIsBubbleSorting(false);
+    setIsInsertionSorting(false);
+    setIsQuickSorting(false);
+
+    setArray((prevArray) =>
+      prevArray.map((bar) => ({ ...bar, color: PRIMARY_COLOR }))
+    );
+
+    setIsAnimationEnabled(false);
+
+    // Clear all the timeouts to stop ongoing animations
+    let id = window.setTimeout(() => {}, 0);
+    while (id--) {
+      window.clearTimeout(id);
+    }
+
+    // Reinitialize the sorting flags and animation state
+    setIsSorting(false);
+    setIsBubbleSorting(false);
+    setIsInsertionSorting(false);
+    setIsQuickSorting(false);
+    setIsAnimationEnabled(true);
+
+    createNewArray();
+  };
 
   // Merge Sort Function
   const mergeSort = () => {
@@ -81,7 +117,9 @@ export default function App() {
       const isColorChange = i % 3 !== 2;
       const [barOneIdx, barTwoIdx] = animations[i];
 
-      if (isColorChange) {
+      if (!isAnimationEnabled) {
+        return;
+      } else if (isColorChange) {
         const color = i % 3 === 0 ? SECONDARY_COLOR : PRIMARY_COLOR;
         setTimeout(() => {
           setArray((prevArray) => {
@@ -123,8 +161,9 @@ export default function App() {
     for (let i = 0; i < animations.length; i++) {
       const isColorChange = i % 4 === 0 || i % 4 === 1;
       const [barOneIdx, barTwoIdx] = animations[i];
-
-      if (isColorChange) {
+      if (!isAnimationEnabled) {
+        return;
+      } else if (isColorChange) {
         const color = i % 4 === 0 ? SECONDARY_COLOR : PRIMARY_COLOR;
         setTimeout(() => {
           setArray((prevArray) => {
@@ -334,6 +373,16 @@ export default function App() {
             </div>
 
             <div className="ms-auto">
+              <button
+                className={`btn btn ${
+                  isDarkMode ? "btn-dark" : "btn-outline-danger"
+                } mx-2`}
+                type="button"
+                onClick={stopSorting}
+              >
+                Stop Sorting
+              </button>
+
               <button
                 className={`btn btn-sm ${
                   isDarkMode ? "btn-dark" : "btn-outline-light"
